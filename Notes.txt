@@ -1,0 +1,3 @@
+Ok for data processing all I really need is in the pool section, there is a daily count and a member count several rows below that
+#TODO make first repo
+#TODO make program to grab data and condense to one file
