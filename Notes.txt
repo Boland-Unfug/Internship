@@ -3,3 +3,4 @@ Ok for data processing all I really need is in the pool section, there is a dail
 #TODO make program to grab data and condense to one file
 - Extraction process made, need to clarify what admissions/covers is
 - Need to convert dates to something better
+- need to standardize numbers to integers (all are positive non decimals)

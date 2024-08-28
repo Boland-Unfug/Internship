@@ -6,6 +6,10 @@ df1 = df.parse('Pool')
 print(df1)
 
 
-# drop everything except rows 2, 4, and 45/46
-df2 = df1.iloc[[2, 4, 45, 46]]
+# drop everything except needed rows
+df2 = df1.iloc[[46,47]]
 print(df2)
+
+# now we add the two rows together
+df3 = df2.iloc[0] + df2.iloc[1]
+print(df3)
