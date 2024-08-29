@@ -6,14 +6,14 @@ import os
 
 
 # clean dataframe
-clean_data = pd.DataFrame()
+clean_dataframe = pd.DataFrame()
 
 # fill date range
 start_date = datetime.date(2022,1,1)
 end_date = datetime.date.today()
 date_range = pd.date_range(start_date, end_date)
 
-clean_data['date'] = date_range
+clean_dataframe['date'] = date_range
 
 def clean_data(df):
     # drop all rows except admissions/covers, members
@@ -34,9 +34,9 @@ def clean_data(df):
     df = df.T
     # reset the index
     df = df.reset_index()
-
+    
     # drop the first and second row
-    df = df.drop([0, 1])
+    df = df.drop(0)
 
     # drop the first column
     df = df.drop('index', axis=1)
@@ -49,6 +49,7 @@ def clean_data(df):
 
     # rename the columns
     df.columns = ['Admissions/Covers', 'Members']
+
     return df
 
 
@@ -62,8 +63,10 @@ for file in files:
     df = pd.ExcelFile('Raw data/' + file)
     df = df.parse('Pool')
     df = clean_data(df)
-    # add 46 to clean_data as non-members
-    # clean_data[file + ' non-members'] = df2[46]
+    # concatinate the dataframes
+    print(df)
+    print(clean_dataframe)
+    clean_dataframe = pd.merge(clean_dataframe, df, on='date', how='left')
 
 
 
