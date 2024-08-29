@@ -4,3 +4,12 @@ Ok for data processing all I really need is in the pool section, there is a dail
 - Extraction process made, need to clarify what admissions/covers is
 - Need to convert dates to something better
 - need to standardize numbers to integers (all are positive non decimals)
+
+Updated plan:
+#TODO create mass Extraction
+- get file names
+- extract each file
+#TODO clean data
+- create complete data cleaning function
+- create a properly dated dataset - DONE
+- fill in properly dated dataset
