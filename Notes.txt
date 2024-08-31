@@ -13,3 +13,4 @@ Updated plan:
 - create complete data cleaning function
 - create a properly dated dataset - DONE
 - fill in properly dated dataset
+#TODO add command line features
