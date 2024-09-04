@@ -14,3 +14,7 @@ Updated plan:
 - create a properly dated dataset - DONE
 - fill in properly dated dataset
 #TODO add command line features
+
+Citations just in case
+https://chatgpt.com/share/c42a116b-8bc7-453d-9133-ebe963d10f9d
+https://chatgpt.com/share/f19ac214-7a11-47f2-97c7-95be2b29df63

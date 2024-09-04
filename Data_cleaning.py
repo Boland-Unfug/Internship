@@ -82,6 +82,10 @@ for file in files:
     # append the dataframe to the clean dataframe
     clean_dataframe = pd.concat([clean_dataframe, df])
     
+# delete the file if it already exists
+if os.path.exists('Clean data/Cleaned_data.csv'):
+    os.remove('Clean data/Cleaned_data.csv')
+
 # save the clean dataframe
 clean_dataframe.to_csv('Clean data/Cleaned_data.csv', index=False)
 
