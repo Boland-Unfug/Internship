@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 # read the data
 df = pd.read_csv('Clean data/Cleaned_data.csv')
 
-# get the total admissions
-df['Total admissions'] = df['Members'] + df['Admissions/Covers']
+# get the Total Admissions
+df['Total Admissions'] = df['Members'] + df['Admissions/Covers']
 
 # set the date to datetime, make date columns
 df['date'] = pd.to_datetime(df['date'])
@@ -22,21 +22,53 @@ data_2022 = df[df['year'] == 2022]
 data_2023 = df[df['year'] == 2023]
 data_2024 = df[df['year'] == 2024]
 
+#plot the data
+# sns.set(style='dark')
+# plt.figure(figsize=(15, 10))
+# sns.scatterplot(data=df, x='date', y='Total Admissions')
+
+# plt.gca().xaxis.set_major_locator(plt.MaxNLocator(6))
+
+# plt.xticks(rotation=45)
+# plt.title('Total Admissions per Day')
+# plt.xlabel('Date')
+# plt.ylabel('Total Admissions')
+
+# plt.savefig('Graphs/Total Admissions Scatter.png')
+# plt.show()
 
 
-# plot the data
+
+# plot the data so that it overlaps
+# sns.set(style='dark')
+# plt.figure(figsize=(15, 10))
+# sns.scatterplot(data=data_2022, x='month_day', y='Total Admissions', label='2022')
+# sns.scatterplot(data=data_2023, x='month_day', y='Total Admissions', label='2023')
+# sns.scatterplot(data=data_2024, x='month_day', y='Total Admissions', label='2024')
+
+# plt.gca().xaxis.set_major_locator(plt.MaxNLocator(12))
+# plt.xticks(rotation=45)
+
+
+# plt.title('Total Admissions per Day')
+# plt.xlabel('Date')
+# plt.ylabel('Total Admissions')
+
+# plt.savefig('Graphs/Total Admissions Overlap Scatter.png')
+# plt.show()
+
+# sum the data by month
+df_month = df.groupby('year_month')['Total Admissions'].sum()
+
+# plot the data by month
 sns.set(style='dark')
 plt.figure(figsize=(15, 10))
-sns.scatterplot(data=data_2022, x='month_day', y='Total admissions', label='2022')
-sns.scatterplot(data=data_2023, x='month_day', y='Total admissions', label='2023')
-sns.scatterplot(data=data_2024, x='month_day', y='Total admissions', label='2024')
+sns.barplot(data=df_month, x='year_month', y='Total Admissions')
 
-plt.gca().xaxis.set_major_locator(plt.MaxNLocator(12))
 plt.xticks(rotation=45)
-
-
-plt.title('Total Admissions per Day')
+plt.title('Total Admissions per Month')
 plt.xlabel('Date')
 plt.ylabel('Total Admissions')
 
+# plt.savefig('Graphs/Total Admissions per Month.png')
 plt.show()
