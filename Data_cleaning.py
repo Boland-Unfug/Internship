@@ -58,8 +58,7 @@ for file in files:
     df = clean_data(df)
 
     # get the start date from the file name
-    file = file[6:]
-    file = file[:-5]
+    file = file[6:-5]
     file = file.split('.')
     start_date = datetime.date(int(file[0]), int(file[1]), 1)
     print(start_date)
@@ -88,6 +87,3 @@ if os.path.exists('Clean data/Cleaned_data.csv'):
 
 # save the clean dataframe
 clean_dataframe.to_csv('Clean data/Cleaned_data.csv', index=False)
-
-
-
