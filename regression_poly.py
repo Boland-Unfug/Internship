@@ -182,6 +182,7 @@ def model_poly( X, X_headers, Y, Y_header, degree=1, title="Polynomial Model", d
 		for j in range(m):
 			# Project the model onto input axis X[:,j]
 			X_line_j = np.ones( X_line.shape ) * np.mean( X, axis=0 ) #np.zeros( X_line.shape )
+			print("X_line_j", X_line_j)
 			X_line_j[:,j] = X_line[:,j]
 			A_line_j = build_input_matrix_poly( X_line_j, degree )
 			Y_line_j = predict( A_line_j, W )
@@ -374,90 +375,75 @@ def model_poly_pairwise(data, headers, degree=1, title="Single Polynomial Regres
 def main( argv ):
 	''' Parse command line arguments: 
 		-- argv[0] is always the name of the program run from the terminal
-		-- argv[1] should be the path of a data file (e.g. *.DATA or *.CSV) 
-		-- argv[2] should be the name of the target feature that the user wants to predict (i.e. the Y-axis header)
-		-- argv[3] should be whisper, where it only draws the graph, andsilent, where it draws nothing.
+		-- argv[1] should be the path of a data file (F) (e.g. *.DATA or *.CSV) 
+		-- argv[2] should be the polynomial degree that the user wants to use in the model (D)
+		-- argv[3] should be the name of the target feature that the user wants to predict (Y) (i.e. the Y-axis header)
+		-- argv[4] should be the name of the input feature that the user wants to use to predict the target feature (X) (i.e. the X-axis header)
+		-- argv[5] silent mode (silent) to suppress the display of figures
   
 	'''
- 
 
 	# Since we don't care too much about decimal places, today, let's make the
 	# output a little more human friendly. Heads up: This isn't always a good idea!
 	np.set_printoptions(precision=3, suppress=True)
 	draw = True
-	# Determne the input file's path: either it was supplied in the commandline, or we should use iris as a default
-	if len(argv) > 1:
-		filepath = argv[1].strip()
-	else:
-		#filepath = "data/iris_preproc.csv"
-		current_directory = os.path.dirname(__file__)
-		filepath = os.path.join(current_directory, "data", "iris_preproc.csv")
-
-	# Read in the dataset and remove NaNs
+	current_directory = os.path.dirname(__file__)
+	filepath = os.path.join(current_directory, "data", "Cleaned_data.csv")
 	data, headers, title = vis.read_csv( filepath )
 	data, headers = vis.remove_nans( data, headers )
-	
-	# Let the user name a polynomial degree, number of gaussian kernels, target feature (Y axis), and/or up to input features (X axis) using the commandline 
-	# parameter prefixes "D=" for polynomial degree, "Y=" for target feature, "X=" for each input feature.
-	# By default it will fit a line to each projection in the dataset's pair plot.
-	Y_header = ""
-	Y = None
-	X_headers = []
-	X = None
-	degree = [1]
 	n = data.shape[0]
+	degree = [1]
+	print(degree)
+	Y_header = None
+	Y = None
+	X_headers = None
+	X = None
+	
 
-	if len(argv) > 2:
-		for param in argv[2:]:
-			if "whisper" in param:
-				draw = False
-			if "Y=" in param:
-				# Find the column that contains the user's chosen feature name 
-				Y_param = param.split("=")[1]
-				if Y_param in headers:
-					Y_idx = headers.index( Y_param )	# CAUTION: this will crash if the user's input does not match any element in the list of headers
-					Y_header = headers[ Y_idx ]
-					Y = data[ :, Y_idx ].reshape((n,1))
-					print( f"Target Y feature selected: {Y_header}" )
+	# Read the commandline arguments
+	for arg in argv:
+		if "silent" in arg:
+			draw = False
+		
+		if "F=" in arg:
+			filepath = arg.split("=")[1]	
+
+		if "D=" in arg:
+			degree = [int(arg.split("=")[1])]
+		
+		if "Y=" in arg:
+			Y_header = arg.split("=")[1]
+			if Y_header not in headers:
+				print( f"\nWARNING: '{Y_header}' not found in the headers list: {headers}. No target Y feature selected.\n" )
+			else:
+				Y_idx = headers.index( Y_header )
+				Y = data[ :, Y_idx ].reshape((n,1))
+
+		if "X=" in arg:
+			X_param = arg.split("=")[1]
+
+			if X_param not in headers:
+				print( f"\nWARNING: '{X_param}' not found in the headers list: {headers}. No input X feauture selected.\n" )
+			else:
+				print(X_param)
+				X_idx = headers.index( X_param )
+				X_headers = [headers[X_idx]]
+				if X is None:
+					X = data[ :, X_idx ].reshape((n,1))
 				else:
-					print( f"\nWARNING: '{Y_param}' not found in the headers list: {headers}. No target Y feature selected.\n" )
+					X = np.hstack( (X, data[ :, X_idx ].reshape((n,1))) )
 
-			elif "D=" in param:	
-				if "D=?" in param:
-					D_param = int(param.split("?")[1])
-					degree = list(range(1,D_param + 1))
-					print( f"List of Polynomial degrees D selected: {degree}" )
-					draw = False
-				else:
-					# Let the user specify the maximum polynomial degree that they want to use in the model with the syntax "D=2", where 2 could be any integer
-					D_param = param.split("=")[1]
-					degree = [int( D_param )]
-					print( f"Polynomial degree D selected: {degree}" )
+	if X_headers and Y_header != None:
+		print("X_headers: " + str(X_headers))
+		print("Y_header: " + str(Y_header))
+		data = np.hstack((X,Y))
+		headers = X_headers + [ Y_header ]
 
-			elif "X=" in param:
-				# Let the user specify 1 or more input features (X axes), with 1 or more "X=feature_name" commandline parameters
-				X_param = param.split("=")[1]
-				if X_param in headers:
-					X_idx = headers.index( X_param )	# CAUTION: this will crash if the user's input does not match any element in the list of headers
-					X_headers.append( headers[ X_idx ] )
-					if len(X_headers) > 1:
-						X = np.hstack( (X, data[ :, X_idx ].reshape((n,1))) )
-					else: 
-						X = data[ :, X_idx ].reshape((n,1))
-					print( f"Input X feature(s) selected: {X_headers}" )
-				else:
-					print( f"\nWARNING: '{X_param}' not found in the headers list: {headers}. No input X feauture selected.\n" )	
-
-	# If the user has specified a Y feature but no X features, use every feature except Y as input, 1 at a time
-	if len(Y_header) > 0 and len(X_headers)==0:
+	if Y_header != None:
 		X = np.delete( data, Y_idx, axis=1 )
 		X_headers = headers[:]
 		X_headers.pop( Y_idx ) 
 
-	# If the user has specified both X and Y features, we can ignore the rest of the dataset
-	elif len(Y_header) > 0 and len(X_headers) > 0:
-		data = np.hstack((X,Y))
-		headers = X_headers + [ Y_header ]
 	rsqlist = []
 	for i in degree:
 		if len(Y_header) > 0:

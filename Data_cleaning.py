@@ -60,13 +60,15 @@ def add_date(df, file):
     # drop row if it does not match the month
     df = df.drop(df[df['date'].dt.month != int(month)].index)
 
-    # set the date as the index
-    df = df.set_index('date', append=False)
-
     return df
 
 # clean dataframe
 clean_dataframe = pd.DataFrame()
+
+# remove the old files
+files = os.listdir('data')
+for file in files:
+    os.remove('data/' + file)
 
 # get the files
 path = 'Raw data'
@@ -82,40 +84,24 @@ for file in files:
     df = clean_data(df)
     df = add_date(df, file)
 
-
-    # delete the file if it already exists
-    if os.path.exists('data/' + str(file) + '.csv'):
-        os.remove('data/' + str(file) + '.csv')
-
     # drop the extra stuff from the file name
     file = file.split('.xlsx')[0]
     file = file.split(' - ')[1]
-    df.to_csv('data/' + str(file) + '.csv', index=True)
+    df.to_csv('data/' + str(file) + '.csv', index=False)
 
     # append the dataframe to the clean dataframe
     clean_dataframe = pd.concat([clean_dataframe, df])
     
-# delete the file if it already exists
-if os.path.exists('data/Cleaned_data.csv'):
-    os.remove('data/Cleaned_data.csv')
-clean_dataframe.to_csv('data/Cleaned_data.csv', index=True)
+# reset the index
+clean_dataframe = clean_dataframe.reset_index(drop=True)
 
-# save the data by year
-data_2022 = clean_dataframe.loc['2022']
-data_2023 = clean_dataframe.loc['2023']
-data_2024 = clean_dataframe.loc['2024']
+clean_dataframe.to_csv('data/Cleaned_data.csv', index=False)
 
-# delete the file if it already exists
-if os.path.exists('data/2022.csv'):
-    os.remove('data/2022.csv')
-data_2022.to_csv('data/2022.csv', index=True)
+# save the three years of data
+data_2022 = clean_dataframe[clean_dataframe['date'].dt.year == 2022]
+data_2023 = clean_dataframe[clean_dataframe['date'].dt.year == 2023]
+data_2024 = clean_dataframe[clean_dataframe['date'].dt.year == 2024]
 
-# delete the file if it already exists
-if os.path.exists('data/2023.csv'):
-    os.remove('data/2023.csv')
-data_2023.to_csv('data/2023.csv', index=True)
-
-# delete the file if it already exists
-if os.path.exists('data/2024.csv'):
-    os.remove('data/2024.csv')
-data_2024.to_csv('data/2024.csv', index=True)
+data_2022.to_csv('data/Cleaned_data_2022.csv', index=False)
+data_2023.to_csv('data/Cleaned_data_2023.csv', index=False)
+data_2024.to_csv('data/Cleaned_data_2024.csv', index=False)
